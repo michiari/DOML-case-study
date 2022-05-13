@@ -15,9 +15,9 @@ image: <aws-ec2-image>
 # host_ip: localhost
 # region: eu-central-1
 # ec2_role_name: DemoEC2Role
-# ssh_key_name: demo-generator-key
+# ssh_key_name: demo-key
 # ssh_key_file_path: /tmp/ssh_key_file
 # ssh_user: ec2-user
-# security_group: demo-generator
+# security_group: demo
 # instance_type: t2.micro
 # image: ami-xxxxxxxxxxxxxxxxx

@@ -5,7 +5,7 @@
     - name: Create a new EC2 security group
       amazon.aws.ec2_group:
         name: "{{ security_group }}"
-        description: Thumbnail generator EC2 security group
+        description: EC2 security group
         vpc_id: "{{ vpc_id }}"
         region: "{{ region }}"
         rules:
