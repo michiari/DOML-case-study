@@ -12,8 +12,8 @@ application app {
 
 infrastructure infra {
 
-	vm_image ec2_img {
-		generates ec2_vm
+	vm_image vm_img {
+		generates vm1
 		image "ami-xxxxxxxxxxxxxxxxx"
 	}
 
@@ -54,7 +54,7 @@ infrastructure infra {
 			cidr ["0.0.0.0/0"]
 		}
 		ifaces i1
-		nodes ec2_vm
+		nodes vm1
 	}
 
 	key_pair ssh_key {
@@ -65,7 +65,7 @@ infrastructure infra {
 	}
 
 	autoscale_group ag {
-		vm ec2_vm {
+		vm vm1 {
 			iface i1 {
 				address "10.0.0.1"
 				belongs_to vpc
@@ -81,7 +81,7 @@ infrastructure infra {
 }
 
 deployment config {
-	nginx -> ec2_vm
+	nginx -> vm1
 }
 
 active deployment config
@@ -89,17 +89,17 @@ active deployment config
 concretizations {
 	concrete_infrastructure con_infra {
 		provider aws {
-			vm concrete_vm {
+			vm ec2_vm {
 				properties {
 					instance_type = "t2.micro";
 					ssh_key_name = "demo-key";
 					ec2_role_name = "demo-ec2-role";
 				}
-				maps ec2_vm
+				maps vm1
 			}
 
 			vm_image concrete_vm_image {
-				maps ec2_img
+				maps vm_img
 			}
 
 			net concrete_net {
