@@ -14,18 +14,11 @@ infrastructure infra {
 
 	vm_image vm_img {
 		generates vm1
-		image "ami-xxxxxxxxxxxxxxxxx"
 	}
 
 	net vpc {
 		address "10.0.0.0/24"
 		protocol "tcp/ip"
-		subnets {
-			net vpc_subnet {
-				address "10.0.0.0/24"
-				protocol "tcp/ip"
-			}
-		}
 	}
 
 	security_group sg {
@@ -72,9 +65,6 @@ infrastructure infra {
 				security sg
 			}
 			credentials ssh_key
-			loc {
-				region "eu-central-1"
-			}
 		}
 		network vpc
 	}
@@ -94,11 +84,15 @@ concretizations {
 					instance_type = "t2.micro";
 					ssh_key_name = "demo-key";
 					ec2_role_name = "demo-ec2-role";
+					region = "eu-central-1";
 				}
 				maps vm1
 			}
 
 			vm_image concrete_vm_image {
+				properties {
+					name = "ami-xxxxxxxxxxxxxxxxx";
+				}
 				maps vm_img
 			}
 
