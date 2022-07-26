@@ -16,7 +16,7 @@ infrastructure infra {
 		generates vm1
 	}
 
-	net vpc {
+	net net1 {
 		address "10.0.0.0/24"
 		protocol "tcp/ip"
 	}
@@ -61,12 +61,12 @@ infrastructure infra {
 		vm vm1 {
 			iface i1 {
 				address "10.0.0.1"
-				belongs_to vpc
+				belongs_to net1
 				security sg
 			}
 			credentials ssh_key
 		}
-		network vpc
+		network net1
 	}
 }
 
@@ -97,7 +97,7 @@ concretizations {
 			}
 
 			net concrete_net {
-				maps vpc
+				maps net1
 			}
 		}
 	}

@@ -12,7 +12,7 @@ application app {
 
 infrastructure infra {
 
-	vm_image v_img {
+	vm_image vm_img {
 		generates vm1
 	}
 
@@ -93,7 +93,7 @@ concretizations {
 				properties {
 					name = "ubuntu-20.04.3";
 				}
-				maps v_img
+				maps vm_img
 			}
 
 			net concrete_net {
