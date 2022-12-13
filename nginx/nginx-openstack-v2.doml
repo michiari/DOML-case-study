@@ -15,7 +15,7 @@ infrastructure infra {
 		vm vm1 {
 			os "ubuntu-20.04.3"
 			iface i1 {
-        address "10.0.0.1"
+				address "10.0.0.1"
 				belongs_to net1
 				security sg
 			}
@@ -29,10 +29,10 @@ infrastructure infra {
 	}
 
 	net ext_net {
-		cidr "10.0.0.0/16"
+		address "10.0.0.0/16"
 		protocol "tcp/ip"
 		subnet net1 {
-			cidr "10.0.0.0/24"
+			address "10.0.0.0/24"
 			protocol "tcp/ip"
 		}
 	}
