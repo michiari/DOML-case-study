@@ -1,0 +1,6 @@
+---
+iac:
+- terraform
+- piacere_monitoring
+- nginx
+...
