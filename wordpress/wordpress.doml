@@ -4,25 +4,25 @@ application app {
 	software_component mysql {
 		properties {
 			db_user = "app1user";
-            db_password = "app1user";
-            db_name = "app1";
+			db_password = "app1user";
+			db_name = "app1";
 		}
 		provides {
-            DB_interface
-        }
+			DB_interface
+		}
 	}
-	
-	software_component wordpress  {
+
+	software_component wordpress {
 		properties {
 			wordpress_db_host = "db_host";
-            wordpress_db_user = "app1user";
-            wordpress_db_password = "app1user";
-            wordpress_db_name = "app1";
-            wordpress_table_prefix = "wp";
+			wordpress_db_user = "app1user";
+			wordpress_db_password = "app1user";
+			wordpress_db_name = "app1";
+			wordpress_table_prefix = "wp";
 		}
 		consumes {
 			DB_interface
-        }
+		}
 	}
 
 }
@@ -59,7 +59,7 @@ infrastructure infra {
 	}
 }
 
-deployment config {	
+deployment config {
 	mysql -> vm1,
 	wordpress -> vm2
 }
@@ -79,7 +79,7 @@ concretizations {
 				}
 				maps vm1
 			}
-			
+
 			vm concrete_vm2 {
 				properties {
 					vm_flavor = "small-centos";
@@ -103,7 +103,7 @@ concretizations {
 				}
 				maps vm1
 			}
-			
+
 			vm concrete_vm2 {
 				properties {
 					vm_flavor = "t2.micro";
