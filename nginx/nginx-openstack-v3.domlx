@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ASCII"?>
-<commons:DOMLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:app="http://www.piacere-project.eu/doml/application" xmlns:commons="http://www.piacere-project.eu/doml/commons" xmlns:infra="http://www.piacere-project.eu/doml/infrastructure" xmlns:optimization="http://www.piacere-project.eu/doml/optimization" name="nginx_openstack" activeConfiguration="//@configurations.0" activeInfrastructure="//@concretizations.0">
+<commons:DOMLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:app="http://www.piacere-project.eu/doml/application" xmlns:commons="http://www.piacere-project.eu/doml/commons" xmlns:infra="http://www.piacere-project.eu/doml/infrastructure" xmlns:opt="http://www.piacere-project.eu/doml/optimization" name="nginx_openstack" version="3.1" activeConfiguration="//@configurations.0" activeInfrastructure="//@concretizations.0">
   <application name="app">
-    <components xsi:type="app:SoftwareComponent" name="nginx">
+    <components xsi:type="app:SoftwareComponent" name="nginx" isPersistent="false">
       <annotations xsi:type="commons:SProperty" key="source_code" value="/usr/share/nginx/html/index.html"/>
     </components>
   </application>
   <infrastructure name="infra">
-    <credentials xsi:type="infra:KeyPair" name="ssh_key" user="vm2user" keyfile="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD3F6tyPEFEzV0LX3X8BsXdMsQz1x2cEikKDEY0aIj41qgxMCP/iteneqXSIFZBp5vizPvaoIR3Um9xK7PGoW8giupGn+EPuxIA4cDM4vzOqOkiMPhz5XK0whEjkVzTo4+S0puvDZuwIsdiW9mxhJc7tgBNL0cYlWSYVkz4G/fslNfRPW5mYAM49f4fhtxPb5ok4Q2Lg9dPKVHO/Bgeu5woMc7RY0p1ej6D4CKFE6lymSDJpW0YHX/wqE9+cfEauh7xZcG0q9t2ta6F6fmX0agvpFyZo8aFbXeUBr7osSCJNgvavWbM/06niWrOvYX2xwWdhXmXSrbX8ZbabVohBK41 email@example.com"/>
-    <groups xsi:type="infra:AutoScalingGroup" name="ag">
+    <credentials xsi:type="commons:KeyPair" name="ssh_key" user="vm2user" key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD3F6tyPEFEzV0LX3X8BsXdMsQz1x2cEikKDEY0aIj41qgxMCP/iteneqXSIFZBp5vizPvaoIR3Um9xK7PGoW8giupGn+EPuxIA4cDM4vzOqOkiMPhz5XK0whEjkVzTo4+S0puvDZuwIsdiW9mxhJc7tgBNL0cYlWSYVkz4G/fslNfRPW5mYAM49f4fhtxPb5ok4Q2Lg9dPKVHO/Bgeu5woMc7RY0p1ej6D4CKFE6lymSDJpW0YHX/wqE9+cfEauh7xZcG0q9t2ta6F6fmX0agvpFyZo8aFbXeUBr7osSCJNgvavWbM/06niWrOvYX2xwWdhXmXSrbX8ZbabVohBK41 email@example.com"/>
+    <groups xsi:type="infra:AutoScalingGroup" name="ag" min="1" max="1" loadBalancer="DEFAULT">
       <machineDefinition name="vm1" os="ubuntu-20.04.3" credentials="//@infrastructure/@credentials.0">
         <ifaces name="i1" endPoint="10.0.0.1" belongsTo="//@infrastructure/@networks.0/@subnets.0" associated="//@infrastructure/@securityGroups.0"/>
       </machineDefinition>
@@ -26,28 +26,28 @@
         <cidr>0.0.0.0/0</cidr>
       </rules>
     </securityGroups>
-    <networks name="ext_net" protocol="tcp/ip" addressRange="10.0.0.0/16">
-      <subnets name="net1" protocol="tcp/ip" addressRange="10.0.0.0/24" connectedIfaces="//@infrastructure/@groups.0/@machineDefinition/@ifaces.0"/>
+    <networks name="ext_net" protocol="tcp/ip">
+      <subnets name="net1" protocol="TCP/IP" connectedIfaces="//@infrastructure/@groups.0/@machineDefinition/@ifaces.0"/>
     </networks>
   </infrastructure>
   <concretizations name="con_infra">
     <providers name="openstack">
-      <vms name="concrete_vm" maps="//@infrastructure/@groups.0/@machineDefinition">
-        <annotations xsi:type="commons:SProperty" key="vm_name" value="nginx-host"/>
-        <annotations xsi:type="commons:SProperty" key="vm_flavor" value="small"/>
+      <networks name="concrete_net" preexisting="false" protocol="tcp/ip" addressRange="10.0.0.0/16" maps="//@infrastructure/@networks.0">
+        <subnets name="concrete_subnet" preexisting="false" addressRange="10.0.0.0/24" maps="//@infrastructure/@networks.0/@subnets.0"/>
+      </networks>
+      <autoScalingGroups name="concrete_ag" resourceName="nginx-host" preexisting="false" vm_type="small" maps="//@infrastructure/@groups.0">
         <annotations xsi:type="commons:SProperty" key="vm_key_name" value="user1"/>
-      </vms>
-      <networks name="nginx_net" maps="//@infrastructure/@networks.0"/>
+      </autoScalingGroups>
     </providers>
   </concretizations>
   <optimization name="opt">
-    <objectives xsi:type="optimization:MeasurableObjective" kind="min" property="cost"/>
+    <objectives xsi:type="opt:MeasurableObjective" kind="min" property="cost"/>
     <nonfunctionalRequirements xsi:type="commons:RangedRequirement" name="req1" description="Cost &lt;= 200" property="cost" max="200.0"/>
     <nonfunctionalRequirements xsi:type="commons:EnumeratedRequirement" name="req2" description="Provider" property="provider">
       <values>OPEN</values>
     </nonfunctionalRequirements>
   </optimization>
-  <configurations name="config">
+  <configurations name="dep_config">
     <deployments component="//@application/@components.0" node="//@infrastructure/@groups.0/@machineDefinition"/>
   </configurations>
 </commons:DOMLModel>

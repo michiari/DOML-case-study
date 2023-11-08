@@ -1,0 +1,126 @@
+doml wordpress {
+	version "3.1"
+	
+	application app {
+		software_component mysql {
+			properties {
+				db_user = "app1user"
+				db_password = "app1user"
+				db_name = "app1"
+			}
+			provides {
+				DB_interface
+			}
+		}
+		software_component wordpress {
+			properties {
+				wordpress_db_host = "db_host"
+				wordpress_db_user = "app1user"
+				wordpress_db_password = "app1user"
+				wordpress_db_name = "app1"
+				wordpress_table_prefix = "wp"
+			}
+			consumes {
+				DB_interface
+			}
+		}
+	}
+	
+	infrastructure infra {
+		key_pair ssh_key {
+			key "local path to ssh key"
+			user "myuser"
+		}
+	
+		vm vm1 {
+			os "ubuntu-20.04.3"
+			credentials ssh_key
+			iface i1 {
+				belongs_to subnet1
+			}
+		}
+	
+		vm vm2 {
+			os "ubuntu-20.04.3"
+			credentials ssh_key
+			iface i2 {
+				belongs_to subnet1
+			}
+		}
+	
+		net net1 {
+			protocol "tcp/ip"
+			subnet subnet1 { }
+		}
+	}
+	
+	deployment dep_config {
+		mysql => vm1
+		wordpress => vm2
+	}
+	
+	active deployment dep_config
+	
+	concretizations {
+		concrete_infrastructure con_os_infra {
+			provider openstack {
+				properties {}
+	
+				vm concrete_vm1 {
+					properties {
+						vm_flavor = "small-centos"
+					}
+					maps vm1
+				}
+	
+				vm concrete_vm2 {
+					properties {
+						vm_flavor = "small-centos"
+					}
+					maps vm2
+				}
+	
+				net concrete_net {
+					properties {}
+					cidr "10.10.10.0/24"
+					subnet concrete_subnet {
+						cidr "10.100.1.0/24"
+						maps subnet1
+					}
+					maps net1
+				}
+			}
+		}
+		concrete_infrastructure con_aws_infra {
+			provider aws {
+				properties {}
+	
+				vm concrete_vm1 {
+					properties {
+						vm_flavor = "t2.micro"
+					}
+					maps vm1
+				}
+	
+				vm concrete_vm2 {
+					properties {
+						vm_flavor = "t2.micro"
+					}
+					maps vm2
+				}
+	
+				net concrete_net {
+					properties {}
+					cidr "10.10.10.0/24"
+					subnet concrete_subnet {
+						cidr "10.100.1.0/24"
+						maps subnet1
+					}
+					maps net1
+				}
+			}
+		}
+		active con_os_infra
+	}
+
+}

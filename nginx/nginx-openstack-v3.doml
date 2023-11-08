@@ -1,0 +1,105 @@
+doml nginx_openstack {
+	version "3.1"
+
+	application app {
+		software_component nginx {
+			properties {
+				source_code="/usr/share/nginx/html/index.html"
+			}
+		}
+	}
+	
+	infrastructure infra {
+		autoscale_group ag {
+			vm vm1 {
+				os "ubuntu-20.04.3"
+				iface i1 {
+					address "10.0.0.1"
+					belongs_to net1
+					security { sg }
+				}
+				credentials ssh_key
+			}
+		}
+		
+		key_pair ssh_key {
+			user "vm2user"
+			key "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD3F6tyPEFEzV0LX3X8BsXdMsQz1x2cEikKDEY0aIj41qgxMCP/iteneqXSIFZBp5vizPvaoIR3Um9xK7PGoW8giupGn+EPuxIA4cDM4vzOqOkiMPhz5XK0whEjkVzTo4+S0puvDZuwIsdiW9mxhJc7tgBNL0cYlWSYVkz4G/fslNfRPW5mYAM49f4fhtxPb5ok4Q2Lg9dPKVHO/Bgeu5woMc7RY0p1ej6D4CKFE6lymSDJpW0YHX/wqE9+cfEauh7xZcG0q9t2ta6F6fmX0agvpFyZo8aFbXeUBr7osSCJNgvavWbM/06niWrOvYX2xwWdhXmXSrbX8ZbabVohBK41 email@example.com"
+		}
+	
+		net ext_net {
+			protocol "tcp/ip"
+			subnet net1 { }
+		}
+	
+		security_group sg {
+			egress icmp {
+				from_port -1
+				to_port -1
+				protocol "icmp"
+				cidrs ["0.0.0.0/0"]
+			}
+			ingress http {
+				from_port 80
+				to_port 80
+				protocol "tcp"
+				cidrs ["0.0.0.0/0"]
+			}
+			ingress https {
+				from_port 443
+				to_port 443
+				protocol "tcp"
+				cidrs ["0.0.0.0/0"]
+			}
+			ingress ssh {
+				from_port 22
+				to_port 22
+				protocol "tcp"
+				cidrs ["0.0.0.0/0"]
+			}
+			ifaces { i1 }
+		}	
+	}
+	
+	deployment dep_config {
+		nginx => vm1
+	}
+	
+	active deployment dep_config
+	
+	concretizations {
+		concrete_infrastructure con_infra {
+			provider openstack {
+				autoscale_group concrete_ag {
+					properties {
+	         			vm_key_name = "user1"
+					}
+					resource_name "nginx-host"
+					vm_type "small"
+					maps ag
+				}
+	
+				net concrete_net {
+					properties {}
+					cidr "10.0.0.0/16"
+					subnet concrete_subnet {
+						cidr "10.0.0.0/24"
+						maps net1
+					}
+					maps ext_net
+				}
+			}
+		}
+		active con_infra
+	}
+	
+	optimization opt {
+		objectives {
+			"cost" => min
+		}
+		nonfunctional_requirements {
+			req1 "Cost <= 200" max 200.0 => "cost"
+			req2 "Provider" values "OPEN" => "provider"
+		}
+	}	
+}
